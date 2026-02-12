@@ -13,6 +13,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["scripts/**/*.ts", "src/**/*.ts"],
-  "exclude": ["node_modules", "dist", "data"]
+  "include": ["scripts/**/*.ts", "src/**/*.ts", "prisma/**/*.ts"],
+  "exclude": ["node_modules", "dist", "data", "dashboard"]
 }

@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id            String          @id @default(cuid())
+  name          String
+  repoFullName  String          @unique @map("repo_full_name")
+  webhookSecret String          @map("webhook_secret")
+  apiKey        String          @unique @map("api_key")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  commits        Commit[]
+  milestones     Milestone[]
+  qualityReports QualityReport[]
+
+  @@map("projects")
+}
+
+model Commit {
+  id               String   @id @default(cuid())
+  sha              String
+  message          String
+  authorName       String   @map("author_name")
+  authorEmail      String   @map("author_email")
+  authorType       String   @map("author_type") // 'human' | 'ai' | 'bot'
+  aiTool           String?  @map("ai_tool")
+  category         String   // 'feat' | 'fix' | 'refactor' | 'docs' | 'test' | 'chore' | 'ci' | 'perf' | 'other'
+  filesChanged     Int      @map("files_changed")
+  insertions       Int
+  deletions        Int
+  testFilesTouched Int      @default(0) @map("test_files_touched")
+  typeFilesTouched Int      @default(0) @map("type_files_touched")
+  timestamp        DateTime
+  projectId        String   @map("project_id")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, sha])
+  @@index([projectId, timestamp])
+  @@map("commits")
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  type        String   // 'tool-transition' | 'velocity-change' | 'quality-signal' | 'structural-change'
+  category    String
+  title       String
+  description String?
+  timestamp   DateTime
+  published   Boolean  @default(false)
+  projectId   String   @map("project_id")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, timestamp])
+  @@map("milestones")
+}
+
+model QualityReport {
+  id          String   @id @default(cuid())
+  type        String   // 'weekly-digest' | 'sprint-retro' | 'alert'
+  windowStart DateTime @map("window_start")
+  windowEnd   DateTime @map("window_end")
+  data        Json
+  projectId   String   @map("project_id")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, type])
+  @@map("quality_reports")
+}

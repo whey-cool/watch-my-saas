@@ -16,15 +16,32 @@
     "building-in-public"
   ],
   "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/src/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "telemetry": "tsx scripts/telemetry.ts",
     "archaeology:fetch": "bash scripts/archaeology/fetch-commits.sh --org whey-cool --local-repos /home/megan/Workspace/herdmate --skip herdmate-freemium --output-dir data/archaeology/raw",
     "archaeology:analyze": "tsx scripts/archaeology/analyze.ts --input-dir data/archaeology/raw --output-dir data/archaeology/analysis",
     "archaeology:wiki": "tsx scripts/archaeology/generate-wiki-pages.ts --input-dir data/archaeology/analysis --output-dir .wiki",
-    "archaeology:all": "npm run archaeology:fetch && npm run archaeology:analyze && npm run archaeology:wiki",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "archaeology:all": "npm run archaeology:fetch && npm run archaeology:analyze && npm run archaeology:wiki"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.0",
+    "@hono/zod-openapi": "^0.18.0",
+    "@prisma/client": "^6.3.0",
+    "hono": "^4.7.0",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^3.0.0",
+    "prisma": "^6.3.0",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"

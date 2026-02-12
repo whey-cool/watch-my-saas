@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: watchmysaas
+      POSTGRES_PASSWORD: watchmysaas
+      POSTGRES_DB: watchmysaas
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchmysaas"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://watchmysaas:watchmysaas@db:5432/watchmysaas?schema=public"
+      API_KEY: "${API_KEY:-change-me-in-production}"
+      PORT: "3000"
+      NODE_ENV: "production"
+      WATCHMYSAAS_FEATURE_DASHBOARD: "${WATCHMYSAAS_FEATURE_DASHBOARD:-false}"
+      WATCHMYSAAS_FEATURE_PUBLIC_TIMELINE: "${WATCHMYSAAS_FEATURE_PUBLIC_TIMELINE:-false}"
+      WATCHMYSAAS_TELEMETRY: "${WATCHMYSAAS_TELEMETRY:-false}"
+      WATCHMYSAAS_INSTANCE_ID: "${WATCHMYSAAS_INSTANCE_ID:-}"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
