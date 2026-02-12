@@ -39,3 +39,6 @@ data/archaeology/
 
 # PRD (references private repos — keep local only)
 wms-prd.md
+
+# Claude Code session todo (managed by hooks)
+.claude-todo.txt
