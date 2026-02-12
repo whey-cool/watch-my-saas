@@ -35,7 +35,8 @@ export interface RepoCommitData {
 export interface ToolSignature {
   readonly raw: string;
   readonly normalized: string;
-  readonly category: 'claude-generic' | 'claude-code' | 'claude-opus' | 'claude-sonnet' | 'claude-flow' | 'parallel-dev' | 'copilot' | 'other';
+  readonly category: 'claude-generic' | 'claude-code' | 'claude-opus' | 'claude-sonnet' | 'claude-flow' | 'parallel-dev' | 'copilot' | 'cursor' | 'bot' | 'human' | 'other';
+  readonly source: 'co-author' | 'author-identity';
 }
 
 export interface ToolTransition {

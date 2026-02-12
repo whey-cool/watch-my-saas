@@ -216,6 +216,107 @@ describe('analyzeToolTransitions', () => {
       );
     }
   });
+
+  it('detects Cursor Agent from author email', () => {
+    const commits: readonly RawCommit[] = [
+      makeCommit({
+        sha: 'cursor001',
+        date: '2025-01-10T12:00:00Z',
+        author: 'Cursor Agent',
+        authorEmail: 'cursoragent@cursor.com',
+        coAuthors: [],
+      }),
+      makeCommit({
+        sha: 'cursor002',
+        date: '2025-01-11T12:00:00Z',
+        author: 'Cursor Agent',
+        authorEmail: 'cursoragent@cursor.com',
+        coAuthors: [],
+      }),
+    ];
+
+    const result = analyzeToolTransitions(commits);
+
+    const cursorSigs = result.signatures.filter((s) => s.category === 'cursor');
+    expect(cursorSigs.length).toBeGreaterThanOrEqual(1);
+    expect(cursorSigs[0].normalized).toBe('Cursor Agent');
+    expect(cursorSigs[0].source).toBe('author-identity');
+    // Should appear in timeline
+    expect(result.signatureTimeline.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('detects Claude Code as commit author (not just co-author)', () => {
+    const commits: readonly RawCommit[] = [
+      makeCommit({
+        sha: 'cc-auth001',
+        date: '2025-01-10T12:00:00Z',
+        author: 'Claude Code',
+        authorEmail: 'claude@herdmate.dev',
+        coAuthors: [],
+      }),
+    ];
+
+    const result = analyzeToolTransitions(commits);
+
+    const ccSigs = result.signatures.filter((s) => s.category === 'claude-code');
+    expect(ccSigs.length).toBeGreaterThanOrEqual(1);
+    expect(ccSigs[0].source).toBe('author-identity');
+  });
+
+  it('does not duplicate when author and co-author point to same tool', () => {
+    const commits: readonly RawCommit[] = [
+      makeCommit({
+        sha: 'dedup001',
+        date: '2025-01-10T12:00:00Z',
+        author: 'Claude Code',
+        authorEmail: 'claude@herdmate.dev',
+        coAuthors: ['Co-Authored-By: Claude Code <noreply@anthropic.com>'],
+      }),
+    ];
+
+    const result = analyzeToolTransitions(commits);
+
+    // Should only have one timeline entry for this date, not two
+    const ccEntries = result.signatureTimeline.filter(
+      (e) => e.signature.normalized === 'Claude Code',
+    );
+    expect(ccEntries).toHaveLength(1);
+    expect(ccEntries[0].count).toBe(1);
+  });
+
+  it('detects bot authors (dependabot, github-actions)', () => {
+    const commits: readonly RawCommit[] = [
+      makeCommit({
+        sha: 'bot001',
+        date: '2025-01-10T12:00:00Z',
+        author: 'dependabot[bot]',
+        authorEmail: '49699333+dependabot[bot]@users.noreply.github.com',
+        coAuthors: [],
+      }),
+    ];
+
+    const result = analyzeToolTransitions(commits);
+
+    const botSigs = result.signatures.filter((s) => s.category === 'bot');
+    expect(botSigs.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('ignores human authors (no false positives)', () => {
+    const commits: readonly RawCommit[] = [
+      makeCommit({
+        sha: 'human001',
+        date: '2025-01-10T12:00:00Z',
+        author: 'Megan Clark',
+        authorEmail: 'meg@wheycoolranch.com',
+        coAuthors: [],
+      }),
+    ];
+
+    const result = analyzeToolTransitions(commits);
+
+    expect(result.signatures).toHaveLength(0);
+    expect(result.signatureTimeline).toHaveLength(0);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -819,8 +920,8 @@ describe('buildUnifiedTimeline', () => {
     signatureTimeline: [],
     transitions: [
       {
-        from: { raw: 'Claude', normalized: 'claude', category: 'claude-generic' },
-        to: { raw: 'Claude Code', normalized: 'claude-code', category: 'claude-code' },
+        from: { raw: 'Claude', normalized: 'claude', category: 'claude-generic', source: 'co-author' },
+        to: { raw: 'Claude Code', normalized: 'claude-code', category: 'claude-code', source: 'co-author' },
         date: '2025-01-15T12:00:00Z',
         repo: 'watch-my-saas',
         confidence: 0.9,
