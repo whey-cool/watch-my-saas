@@ -36,3 +36,6 @@ data/archaeology/
 
 # Wiki clone (managed by scripts/wiki.sh)
 .wiki/
+
+# PRD (references private repos — keep local only)
+wms-prd.md

@@ -19,6 +19,12 @@ ensure_wiki() {
         echo "Pulling latest wiki..."
         git -C "${WIKI_DIR}" pull --rebase
     fi
+    # Inherit git identity from the main repo
+    local main_name main_email
+    main_name=$(git -C "${REPO_ROOT}" config user.name 2>/dev/null || echo "whey-cool")
+    main_email=$(git -C "${REPO_ROOT}" config user.email 2>/dev/null || echo "whey-cool@users.noreply.github.com")
+    git -C "${WIKI_DIR}" config user.name "${main_name}"
+    git -C "${WIKI_DIR}" config user.email "${main_email}"
 }
 
 wiki_commit_and_push() {
