@@ -6,9 +6,9 @@ An open-source development intelligence API for vibe coders. You plug it into yo
 
 The audience builds fast with AI tools (Cursor, Claude Code, Copilot). They want signal, not ceremony.
 
-### The Core: AI Recommendations
+### The Core: Heuristic Pattern Detection
 
-Metrics and dashboards are table stakes. The real product is **AI-generated recommendations from analyzing development logs**. After ingesting your commit history, PR patterns, tool transitions, quality signals, and velocity data, Watch My SaaS produces actionable, context-aware recommendations.
+Metrics and dashboards are table stakes. The real product is **heuristic-based pattern detection from development logs**. After ingesting your commit history, PR patterns, tool transitions, quality signals, and velocity data, Watch My SaaS detects actionable patterns — sprint-drift cycles, workflow breakthroughs, test coverage drift, file churn hot spots — and surfaces them as recommendations. v1 is pure heuristics (no LLM dependency). v2 adds optional BYOK LLM narration.
 
 ### Origin
 
@@ -21,7 +21,11 @@ Developed within the HerdMate ecosystem (`whey-cool/herdmate`). HerdMate provide
 - **Integration:** GitHub webhook + API key
 - **Stack:** Hono (API), Zod (validation), Prisma + PostgreSQL (data), Vite + React (dashboard SPA), vanilla TS (embed widget)
 - **Auth:** Simple API key (Bearer token). No OAuth, no Clerk.
-- **Tooling:** Claude Code as primary dev agent, GitHub Copilot cloud agents for background tasks. `.claude/` config ported from HerdMate, optimized in Session 2 for this stack (Hono/Prisma/vitest/RFC 7807).
+- **Tooling:** Claude Code as primary dev agent, Copilot Coding Agent for background tasks. `.claude/` config ported from HerdMate, optimized in Session 2 for this stack (Hono/Prisma/vitest/RFC 7807).
+- **Recommendation Engine (OQ-1):** Heuristics-only v1 (sprint-drift cycle detection, velocity tracking, file churn, tool transitions, workflow breakthroughs). Optional BYOK LLM narration in v2.
+- **Deployment (OQ-2):** Docker Compose canonical, Railway one-click template for onboarding. Stateful server, no serverless.
+- **AI Tooling (OQ-3):** Claude Code for primary development (architecture, features, debugging). Copilot Coding Agent for background tasks (tests, docs, small fixes via GitHub issues).
+- **Report Windowing (OQ-5):** Weekly digest (suppressed if <5 commits) + sprint retrospectives on velocity drop + event-driven public timeline + immediate alerts for revert spikes/coverage drops.
 
 ## Session History
 
@@ -31,27 +35,14 @@ Built the three-stage archaeology pipeline (fetch → analyze → wiki) that ext
 ### Session 2: ECC Optimization & Config Cleanup
 Audited and aligned all Claude Code configuration to the project stack. Fixed settings hook format. Deleted 18 irrelevant skills (Django, Spring Boot, Go, Python, Java, C++, etc.) and 6 irrelevant commands. Fixed framework mismatches in 3 skills (tdd-workflow, security-review, coding-standards) — replacing jest/Next.js/Supabase/Express patterns with vitest/Hono/Prisma/RFC 7807. Self-reviewed and caught 3 additional missed issues. Zero stale references remaining.
 
+### Session 3: Archaeology Debrief & Decision Session
+Brainstorm session validating archaeology findings against developer memory. Confirmed sprint-drift cycle as the core pattern of AI-assisted development. Resolved OQ-1 (heuristics-only v1), OQ-2 (Docker Compose + Railway), OQ-3 (Claude Code primary + Copilot background), OQ-5 (hybrid weekly + event windowing). 4 brainstorm pages + 4 decision pages + Architecture.md updated.
+
 ## Open Questions
-
-### OQ-1: The LLM dependency problem [Session 3]
-
-The recommendation engine needs an LLM strategy: pure heuristics, LLM-powered (BYOK), hybrid (rules detect + LLM narrates), or local model. To be resolved after archaeology data informs which recommendations need LLM reasoning vs heuristics.
-
-### OQ-2: Deployment model for vibe coders [Session 3]
-
-Docker Compose vs Railway/Render one-click deploy vs Vercel + Neon/Supabase serverless. Affects architecture (stateless vs persistent, connection pooling, etc.).
-
-### OQ-3: Copilot cloud agents — what's real? [Session 3]
-
-Research needed on current Copilot agent capabilities in CI/CD workflows, alternatives, and cost models before designing the agent division of labor.
 
 ### OQ-4: Testing the thing that tests things [Session 4]
 
 Testing strategy for a code quality analysis tool. Needs unit tests for classification heuristics, integration tests for webhook pipeline, snapshot tests for recommendation output, and test fixtures from archaeology data.
-
-### OQ-5: Report windowing [Session 3]
-
-Fixed commit count vs time-based vs event-based vs configurable. Archaeology data will inform natural development rhythms.
 
 ## Commands
 
