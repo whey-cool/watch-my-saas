@@ -19,7 +19,13 @@ Heuristic-based pattern detection from development logs. Not a metrics dashboard
 Built within the HerdMate ecosystem (whey-cool/herdmate). HerdMate is the first and most important user. The founder uses Watch My SaaS to guide her own HerdMate development.
 
 ## Current State
-- **Session 4** (Foundation + Learning Infrastructure) is the active session
-- Sessions 1-3 completed: archaeology pipeline, config cleanup, competitive analysis, decision-making
-- `src/` is empty — API scaffold is Session 4's primary deliverable
-- `scripts/archaeology/` contains the existing fetch→analyze→wiki pipeline with 35 tests
+- **Session 4 complete** — Foundation + Learning Infrastructure built
+- API scaffold: Hono + Prisma + Zod, 4 routes, 3 middleware, 3 services
+- Webhook pipeline: GitHub push → HMAC verify → classify commits → store in Postgres
+- Dashboard skeleton: Vite + React + Tailwind, 3 pages, feature-flagged
+- Telemetry: opt-in anonymous heartbeat (Pulse)
+- 66 tests, 95.37% coverage, zero type errors
+- CI: GitHub Actions (test + type check on PR/push)
+- Community: GitHub Discussions enabled, issue templates, CONTRIBUTING.md
+- **Next: Session 5** — Recommendations + HerdMate Goes Live
+- All open questions resolved (OQ-1 through OQ-5)

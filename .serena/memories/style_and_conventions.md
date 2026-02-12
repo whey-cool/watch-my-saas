@@ -19,7 +19,7 @@
 - User-friendly messages in UI-facing code
 - Detailed context in server-side logs
 - Never silently swallow errors
-- RFC 7807 error responses for the API (from HerdMate patterns)
+- RFC 9457 Problem Details error responses for the API (evolved from HerdMate's RFC 7807)
 
 ## API Conventions (planned)
 - Consistent envelope: `{ success, data?, error?, meta? }`

@@ -77,13 +77,16 @@ Onboarded Serena MCP server for semantic code intelligence. Created 6 memory fil
 ### Session 4b: Foundation + Learning Infrastructure
 First code session. Built the full API scaffold, webhook pipeline, dashboard skeleton, and community infrastructure. Hono API with Zod validation, HMAC-verified webhook endpoint, commit classification service (AI tool detection ported from archaeology — validated on 1223 commits), Prisma schema (Project, Commit, Milestone, QualityReport), opt-in telemetry, feature-flagged dashboard (Vite + React + Tailwind), CI workflow, issue templates, CONTRIBUTING.md. 66 tests, TDD throughout. Resolved OQ-4 (testing strategy: unit + integration + fixtures from archaeology ground truth, 80% coverage threshold). Enforcement pyramid: workflow rules + hook infrastructure + invariant 11.
 
+### Session 5: Recommendations Engine
+Built the full recommendation engine (heuristics v1) transforming Watch My SaaS from a data collector into a development GPS. 7 pattern detectors (Sprint-Drift, Ghost Churn, AI Handoff Cliff, Tool Transition, Test Coverage Drift, Changelog Silence, Workflow Breakthrough) with pure-function architecture. Metric aggregation pipeline builds 7-day windows from commit streams. Phase detector synthesizes metrics into project phase (Building/Drifting/Stabilizing/Ship-Ready). Engine orchestrator handles staleness, deduplication, and recommendation lifecycle. 6 new API endpoints (project overview, recommendations CRUD, analyze trigger, reports, timeline). Dashboard upgraded with GPS-style progressive disclosure: project overview (L1), recommendations feed (L2), quality reports (L3). `/recommend-validate` command validates all 7 detectors against synthetic ground truth at 100% accuracy. 161 tests, 97.5% statement coverage, TDD throughout. HerdMate webhook setup deferred to session start of Session 6 (requires live GitHub configuration).
+
 ## Next Session
 
-### Session 5: Recommendations + HerdMate Goes Live
+### Session 6: Backfill + Full HerdMate History
 
-Build the recommendation engine (heuristics v1) and connect HerdMate as the first live project. The classification pipeline from Session 4 stores commits; Session 5 analyzes them for patterns (sprint-drift, ghost churn, test coverage drift, etc.) and surfaces actionable recommendations.
+Connect HerdMate as the first live project. Set up GitHub webhook on `whey-cool/herdmate`, backfill existing commit history, run the recommendation engine against real data, and begin the dogfood loop. Visual timeline view for the dashboard.
 
-Key deliverables: Recommendation engine + pattern detectors + HerdMate webhook setup + recommendation dashboard views + `/recommend-validate` command.
+Key deliverables: HerdMate webhook live + commit backfill + dogfood loop active + timeline visualization + `/dogfood` command.
 
 ## Open Questions
 
@@ -93,8 +96,8 @@ No open questions. OQ-1 through OQ-5 all resolved.
 
 ```
 Session 4: Foundation + Learning Infrastructure ← COMPLETE
-Session 5: Recommendations + HerdMate Goes Live
-Session 6: Backfill + Full HerdMate History
+Session 5: Recommendations Engine ← COMPLETE
+Session 6: Backfill + Full HerdMate History + HerdMate Goes Live
     [Personal use phase — weeks on HerdMate]
 Session 7: Public Surface + Ship to Others
 Session 8+: Adaptive (data-driven)
@@ -120,10 +123,10 @@ HerdMate-first: the tool must be useful on HerdMate before it ships to anyone el
 
 - `/webhook-test` — Send test GitHub webhook payloads to local API, verify classification output
 - `/telemetry-check` — Review Pulse telemetry state and validate heartbeat payload (invariant 7)
+- `/recommend-validate` — Run recommendation engine against synthetic ground truth, report detected/missed/false positive rate per pattern.
 
 ### Planned Commands (built in the session that needs them)
 
-- `/recommend-validate` — _(Session 5)_ Run recommendation engine against archaeology fixtures, compare to ground truth, report detected/missed/false positive rate.
 - `/dogfood` — _(Session 6)_ Check recommendation accuracy log for HerdMate. Report true positive / false positive / useful / noisy breakdown (invariant 9).
 
 ### NPM Scripts
@@ -134,6 +137,7 @@ HerdMate-first: the tool must be useful on HerdMate before it ships to anyone el
 - `npm run db:migrate` — Run Prisma migrations
 - `npm run telemetry -- status|enable|disable` — Manage telemetry
 - `npm run archaeology:all` — Run full archaeology pipeline
+- `npm run recommend:validate` — Run recommendation validation against ground truth
 
 ## Project Structure
 
@@ -143,29 +147,46 @@ watch-my-saas/
 │   ├── index.ts                       # @hono/node-server entry point
 │   ├── app.ts                         # Hono app factory (testable)
 │   ├── config.ts                      # Zod-validated env + feature flags
-│   ├── types.ts                       # ProblemDetails, ClassifiedCommit, Payload types
+│   ├── types.ts                       # ProblemDetails, ClassifiedCommit, Recommendation, MetricWindow types
 │   ├── routes/
 │   │   ├── health.ts                  # GET /api/health
 │   │   ├── webhooks.ts                # POST /api/webhooks/github (HMAC)
-│   │   └── projects.ts               # GET /api/projects, commits
+│   │   ├── projects.ts               # GET /api/projects, GET /api/projects/:id overview
+│   │   ├── recommendations.ts         # GET/PATCH recommendations, POST analyze
+│   │   ├── reports.ts                 # GET /api/projects/:id/reports (paginated)
+│   │   └── timeline.ts               # GET /api/projects/:id/timeline
 │   ├── middleware/
 │   │   ├── auth.ts                    # Bearer token API key
 │   │   └── error-handler.ts           # RFC 9457 Problem Details
 │   ├── services/
 │   │   ├── classification.ts          # Author type + category + quality signals
 │   │   ├── webhook-processor.ts       # Extract → classify → store pipeline
-│   │   └── telemetry.ts              # Pulse heartbeat generation
+│   │   ├── telemetry.ts              # Pulse heartbeat generation
+│   │   └── recommendations/           # Pattern detection engine
+│   │       ├── engine.ts              # Orchestrator: fetch → aggregate → detect → store
+│   │       ├── metrics.ts             # MetricWindow aggregation + trend calculation
+│   │       ├── phase-detector.ts      # Project phase synthesis (Building/Drifting/Stabilizing/Ship-Ready)
+│   │       └── detectors/             # 7 pure-function pattern detectors
+│   │           ├── index.ts           # DETECTORS array export
+│   │           ├── sprint-drift.ts
+│   │           ├── ghost-churn.ts
+│   │           ├── ai-handoff-cliff.ts
+│   │           ├── tool-transition.ts
+│   │           ├── test-drift.ts
+│   │           ├── changelog-silence.ts
+│   │           └── workflow-breakthrough.ts
 │   ├── db/
 │   │   └── client.ts                  # Prisma singleton
-│   └── __tests__/                     # 66 tests (vitest)
+│   └── __tests__/                     # 161 tests (vitest)
 ├── dashboard/                         # Vite + React + Tailwind SPA
 │   └── src/
-│       ├── pages/                     # Health, Projects, Commits
-│       └── components/                # Layout, AuthorBadge
+│       ├── pages/                     # Health, Projects, Commits, Overview, Recommendations, Reports
+│       └── components/                # Layout, AuthorBadge, PhaseBadge, SeverityBadge, MetricCard
 ├── prisma/
-│   └── schema.prisma                  # Project, Commit, Milestone, QualityReport
+│   └── schema.prisma                  # Project, Commit, Milestone, QualityReport, Recommendation
 ├── scripts/
 │   ├── telemetry.ts                   # CLI: status | enable | disable
+│   ├── recommend-validate.ts          # Recommendation engine ground truth validation
 │   ├── wiki.sh                        # Wiki operations wrapper
 │   └── archaeology/                   # Fetch + analyze + wiki pipeline
 ├── .github/
@@ -173,7 +194,7 @@ watch-my-saas/
 │   ├── ISSUE_TEMPLATE/                # bug, feature, copilot-task
 │   └── DISCUSSION_TEMPLATE/           # debugging-my-workflow
 ├── .claude/
-│   ├── commands/                      # wiki-*, session-*, webhook-test, telemetry-check
+│   ├── commands/                      # wiki-*, session-*, webhook-test, telemetry-check, recommend-validate
 │   ├── hooks/                         # PostToolUse (task state sync)
 │   └── rules/workflow.md              # Phase gate protocol, swarm rules
 ├── docker-compose.yml                 # Postgres + app

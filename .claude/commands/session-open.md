@@ -7,7 +7,7 @@ Run at the start of every session to detect stale documentation and set up the s
 Read these files and cross-reference for staleness:
 
 - `CLAUDE.md` — project state, decisions, structure, commands, invariants
-- `wms-prd.md` — session plan, deliverables, exit conditions
+- `docs/wms-prd.md` — session plan, deliverables, exit conditions
 - `.wiki/Home.md` — page index completeness
 - `.wiki/Developers-Guide.md` — setup instructions, commands list, prerequisites
 - `.wiki/Architecture.md` — stack, data flow, open questions

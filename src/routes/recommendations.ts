@@ -1,0 +1,93 @@
+/**
+ * Recommendation API routes.
+ * GET recommendations, PATCH status, POST analyze.
+ */
+
+import { Hono } from 'hono';
+import { prisma } from '../db/client.js';
+import { analyzeProject } from '../services/recommendations/engine.js';
+import type { RecommendationStatus } from '../types.js';
+
+const VALID_STATUSES: readonly RecommendationStatus[] = ['acknowledged', 'dismissed'];
+const VALID_FILTER_STATUSES: readonly RecommendationStatus[] = ['active', 'acknowledged', 'dismissed', 'resolved'];
+const VALID_SEVERITIES = ['critical', 'high', 'medium', 'low'] as const;
+
+export const recommendationsRoute = new Hono();
+
+recommendationsRoute.get('/projects/:id/recommendations', async (c) => {
+  const projectId = c.req.param('id');
+  const statusFilter = c.req.query('status') ?? 'active';
+  const severityFilter = c.req.query('severity');
+
+  const where: Record<string, unknown> = { projectId, status: statusFilter };
+  if (severityFilter && VALID_SEVERITIES.includes(severityFilter as typeof VALID_SEVERITIES[number])) {
+    where.severity = severityFilter;
+  }
+
+  const recommendations = await prisma.recommendation.findMany({
+    where,
+    orderBy: { detectedAt: 'desc' },
+  });
+
+  return c.json({
+    data: recommendations.map((r) => ({
+      id: r.id,
+      pattern: r.pattern,
+      severity: r.severity,
+      title: r.title,
+      description: r.description,
+      evidence: r.evidence,
+      nextSteps: r.nextSteps,
+      status: r.status,
+      detectedAt: r.detectedAt.toISOString(),
+      acknowledgedAt: r.acknowledgedAt?.toISOString() ?? null,
+      dismissedAt: r.dismissedAt?.toISOString() ?? null,
+      resolvedAt: r.resolvedAt?.toISOString() ?? null,
+    })),
+  });
+});
+
+recommendationsRoute.patch('/projects/:id/recommendations/:rid', async (c) => {
+  const recId = c.req.param('rid');
+  const body = await c.req.json<{ status: string }>();
+
+  if (!VALID_STATUSES.includes(body.status as RecommendationStatus)) {
+    return c.json(
+      {
+        type: 'about:blank',
+        status: 400,
+        title: 'Bad Request',
+        detail: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`,
+      },
+      400,
+    );
+  }
+
+  const timestampField = body.status === 'acknowledged' ? 'acknowledgedAt' : 'dismissedAt';
+
+  const updated = await prisma.recommendation.update({
+    where: { id: recId },
+    data: {
+      status: body.status,
+      [timestampField]: new Date(),
+    },
+  });
+
+  return c.json({
+    data: {
+      id: updated.id,
+      status: updated.status,
+    },
+  });
+});
+
+recommendationsRoute.post('/projects/:id/analyze', async (c) => {
+  const projectId = c.req.param('id');
+  const result = await analyzeProject(projectId);
+
+  return c.json({
+    phase: result.phase,
+    recommendations: result.recommendations,
+    windowCount: result.windows.length,
+  });
+});

@@ -5,6 +5,9 @@ import { apiKeyAuth } from './middleware/auth.js';
 import { healthRoute } from './routes/health.js';
 import { webhooksRoute } from './routes/webhooks.js';
 import { projectsRoute } from './routes/projects.js';
+import { recommendationsRoute } from './routes/recommendations.js';
+import { reportsRoute } from './routes/reports.js';
+import { timelineRoute } from './routes/timeline.js';
 
 export interface AppOptions {
   readonly apiKey: string;
@@ -26,6 +29,9 @@ export function createApp(options: AppOptions) {
 
   // Protected routes
   app.route('/api', projectsRoute);
+  app.route('/api', recommendationsRoute);
+  app.route('/api', reportsRoute);
+  app.route('/api', timelineRoute);
 
   // Dashboard SPA (feature-flagged)
   if (options.dashboardEnabled) {

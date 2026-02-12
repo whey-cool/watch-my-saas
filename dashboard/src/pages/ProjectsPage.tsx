@@ -46,7 +46,7 @@ export default function ProjectsPage() {
               <tr key={project.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3">
                   <Link
-                    to={`/projects/${project.id}/commits`}
+                    to={`/projects/${project.id}`}
                     className="text-blue-600 hover:underline font-medium"
                   >
                     {project.repoFullName}
