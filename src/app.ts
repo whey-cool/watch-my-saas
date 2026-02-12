@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { errorHandler } from './middleware/error-handler.js';
 import { apiKeyAuth } from './middleware/auth.js';
 import { healthRoute } from './routes/health.js';
+import { webhooksRoute } from './routes/webhooks.js';
 import { projectsRoute } from './routes/projects.js';
 
 export interface AppOptions {
@@ -14,10 +15,11 @@ export function createApp(options: AppOptions) {
   // Error handler
   app.onError(errorHandler);
 
-  // Health (no auth)
+  // No-auth routes (health + webhooks)
   app.route('/api', healthRoute);
+  app.route('/api', webhooksRoute);
 
-  // Auth middleware for all /api/* except health and webhooks
+  // Auth middleware for remaining /api/* routes
   app.use('/api/*', apiKeyAuth(options.apiKey));
 
   // Protected routes
