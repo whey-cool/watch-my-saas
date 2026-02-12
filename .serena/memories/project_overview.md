@@ -19,13 +19,16 @@ Heuristic-based pattern detection from development logs. Not a metrics dashboard
 Built within the HerdMate ecosystem (whey-cool/herdmate). HerdMate is the first and most important user. The founder uses Watch My SaaS to guide her own HerdMate development.
 
 ## Current State
-- **Session 4 complete** — Foundation + Learning Infrastructure built
-- API scaffold: Hono + Prisma + Zod, 4 routes, 3 middleware, 3 services
-- Webhook pipeline: GitHub push → HMAC verify → classify commits → store in Postgres
-- Dashboard skeleton: Vite + React + Tailwind, 3 pages, feature-flagged
-- Telemetry: opt-in anonymous heartbeat (Pulse)
-- 66 tests, 95.37% coverage, zero type errors
+- **Session 5 complete** — Recommendation engine (heuristics v1)
+- 7 pattern detectors: Sprint-Drift, Ghost Churn, AI Handoff Cliff, Tool Transition, Test Drift, Changelog Silence, Workflow Breakthrough
+- Metric aggregation: 7-day windows from commit streams
+- Phase detector: Building / Drifting / Stabilizing / Ship-Ready
+- Engine orchestrator: fetch → aggregate → detect → deduplicate → store
+- 10 API routes (health, webhooks, projects, overview, recommendations, reports, timeline)
+- Dashboard GPS views: ProjectOverview (L1), RecommendationsPage (L2), QualityReportsPage (L3)
+- `/recommend-validate` passes 100% (7/7 patterns, 0 false positives)
+- 161 tests, 97.54% coverage, zero type errors
 - CI: GitHub Actions (test + type check on PR/push)
 - Community: GitHub Discussions enabled, issue templates, CONTRIBUTING.md
-- **Next: Session 5** — Recommendations + HerdMate Goes Live
+- **Next: Session 6** — Backfill + Full HerdMate History + HerdMate Goes Live
 - All open questions resolved (OQ-1 through OQ-5)

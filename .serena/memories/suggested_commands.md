@@ -29,6 +29,9 @@
 ## TypeScript
 - `npx tsc --noEmit` — Type-check without emitting
 
+## Recommendation Validation
+- `npm run recommend:validate` — Run recommendation engine against synthetic ground truth (7/7 patterns expected)
+
 ## Archaeology Pipeline
 - `npm run archaeology:all` — Full pipeline: fetch → analyze → wiki
 - `npm run archaeology:fetch` — Fetch commit data
