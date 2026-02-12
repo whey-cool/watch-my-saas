@@ -53,17 +53,41 @@ Fixed commit count vs time-based vs event-based vs configurable. Archaeology dat
 - `/wiki-changelog` — Append a changelog entry for recent work
 - `/wiki-brainstorm` — Capture a brainstorm session to the wiki
 
+### Archaeology Commands
+
+- `npm run archaeology:fetch` — Fetch commit data from local repos + GitHub API
+- `npm run archaeology:analyze` — Run all analyzers on raw commit data
+- `npm run archaeology:wiki` — Generate wiki pages from analysis results
+- `npm run archaeology:all` — Run full pipeline (fetch → analyze → wiki)
+- `npm test` — Run analyzer tests (vitest)
+
 ## Project Structure
 
 ```
 watch-my-saas/
-├── src/                  # API source code (Hono + Prisma)
-├── dashboard/            # Dashboard SPA (Vite + React)
-├── scripts/              # Automation scripts
-│   └── wiki.sh           # Wiki operations wrapper
+├── scripts/
+│   ├── wiki.sh                        # Wiki operations wrapper
+│   └── archaeology/
+│       ├── fetch-commits.sh           # Fetches from local git + GitHub API
+│       ├── parse-git-log.mjs          # Parses git log → JSON
+│       ├── transform-api-commits.mjs  # Normalizes GitHub API → JSON
+│       ├── analyze.ts                 # Orchestrator: runs all analyzers
+│       ├── generate-wiki-pages.ts     # Orchestrator: analysis → wiki markdown
+│       ├── types.ts                   # Shared TypeScript interfaces
+│       ├── analyzers/
+│       │   ├── tool-transitions.ts    # Co-Author signature timeline
+│       │   ├── velocity-phases.ts     # Weekly commit frequency + phases
+│       │   ├── quality-evolution.ts   # Test adoption, churn, reverts
+│       │   ├── structural-growth.ts   # Directory timeline, size trajectory
+│       │   └── unified-timeline.ts    # Merges all signals chronologically
+│       ├── wiki-generators/           # One per wiki page
+│       └── __tests__/
+│           └── analyzers.test.ts      # 30 tests covering all analyzers
+├── data/archaeology/                  # Gitignored — raw + analysis JSON
 ├── .claude/
-│   └── commands/         # Claude Code slash commands
-├── CLAUDE.md             # This file
+│   └── commands/                      # Claude Code slash commands
+├── CLAUDE.md                          # This file
+├── tsconfig.json
 ├── package.json
 └── README.md
 ```

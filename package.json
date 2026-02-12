@@ -1,6 +1,7 @@
 {
   "name": "watch-my-saas",
   "version": "0.1.0",
+  "type": "module",
   "description": "Open-source development intelligence API for vibe coders. GitHub webhook integration for AI-assisted development analytics, quality tracking, and auto-generated public timelines.",
   "license": "MIT",
   "repository": {
@@ -13,5 +14,19 @@
     "ai-assisted-development",
     "github-webhooks",
     "building-in-public"
-  ]
+  ],
+  "scripts": {
+    "archaeology:fetch": "bash scripts/archaeology/fetch-commits.sh --org whey-cool --local-repos /home/megan/Workspace/herdmate --skip herdmate-freemium --output-dir data/archaeology/raw",
+    "archaeology:analyze": "tsx scripts/archaeology/analyze.ts --input-dir data/archaeology/raw --output-dir data/archaeology/analysis",
+    "archaeology:wiki": "tsx scripts/archaeology/generate-wiki-pages.ts --input-dir data/archaeology/analysis --output-dir .wiki",
+    "archaeology:all": "npm run archaeology:fetch && npm run archaeology:analyze && npm run archaeology:wiki",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
 }
