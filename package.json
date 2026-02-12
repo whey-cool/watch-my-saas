@@ -1,0 +1,17 @@
+{
+  "name": "watch-my-saas",
+  "version": "0.1.0",
+  "description": "Open-source development intelligence API for vibe coders. GitHub webhook integration for AI-assisted development analytics, quality tracking, and auto-generated public timelines.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/whey-cool/watch-my-saas.git"
+  },
+  "keywords": [
+    "developer-tools",
+    "analytics",
+    "ai-assisted-development",
+    "github-webhooks",
+    "building-in-public"
+  ]
+}
