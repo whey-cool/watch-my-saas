@@ -21,7 +21,15 @@ Developed within the HerdMate ecosystem (`whey-cool/herdmate`). HerdMate provide
 - **Integration:** GitHub webhook + API key
 - **Stack:** Hono (API), Zod (validation), Prisma + PostgreSQL (data), Vite + React (dashboard SPA), vanilla TS (embed widget)
 - **Auth:** Simple API key (Bearer token). No OAuth, no Clerk.
-- **Tooling:** Claude Code as primary dev agent, GitHub Copilot cloud agents for background tasks. `.claude/` config ported from HerdMate.
+- **Tooling:** Claude Code as primary dev agent, GitHub Copilot cloud agents for background tasks. `.claude/` config ported from HerdMate, optimized in Session 2 for this stack (Hono/Prisma/vitest/RFC 7807).
+
+## Session History
+
+### Session 1: Git Archaeology Pipeline
+Built the three-stage archaeology pipeline (fetch → analyze → wiki) that extracts the development narrative from 1223 commits across 7 whey-cool repos. 5 analyzers (tool transitions, velocity phases, quality evolution, structural growth, unified timeline), 35 tests, 5 wiki pages generated with real data. Added author-identity detection bringing AI commit detection from 47% to 64%.
+
+### Session 2: ECC Optimization & Config Cleanup
+Audited and aligned all Claude Code configuration to the project stack. Fixed settings hook format. Deleted 18 irrelevant skills (Django, Spring Boot, Go, Python, Java, C++, etc.) and 6 irrelevant commands. Fixed framework mismatches in 3 skills (tdd-workflow, security-review, coding-standards) — replacing jest/Next.js/Supabase/Express patterns with vitest/Hono/Prisma/RFC 7807. Self-reviewed and caught 3 additional missed issues. Zero stale references remaining.
 
 ## Open Questions
 
@@ -85,7 +93,8 @@ watch-my-saas/
 │           └── analyzers.test.ts      # 30 tests covering all analyzers
 ├── data/archaeology/                  # Gitignored — raw + analysis JSON
 ├── .claude/
-│   └── commands/                      # Claude Code slash commands
+│   ├── commands/                      # Claude Code slash commands (wiki-*)
+│   └── hooks/                         # PostToolUse hooks (task state sync)
 ├── CLAUDE.md                          # This file
 ├── tsconfig.json
 ├── package.json
