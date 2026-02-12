@@ -174,9 +174,11 @@ export default function QualityReportsPage() {
                 className="bg-white border border-gray-200 rounded-lg overflow-hidden"
               >
                 {/* Report header */}
-                <div
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition"
+                <button
+                  type="button"
+                  className="w-full p-4 text-left cursor-pointer hover:bg-gray-50 transition bg-transparent border-none"
                   onClick={() => toggleExpand(report.id)}
+                  aria-expanded={isExpanded}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
@@ -194,7 +196,7 @@ export default function QualityReportsPage() {
                         </span>
                       </div>
                     </div>
-                    <button className="text-gray-400 hover:text-gray-600 transition">
+                    <span className="text-gray-400" aria-hidden="true">
                       {isExpanded ? (
                         <svg
                           className="w-5 h-5"
@@ -224,9 +226,9 @@ export default function QualityReportsPage() {
                           />
                         </svg>
                       )}
-                    </button>
+                    </span>
                   </div>
-                </div>
+                </button>
 
                 {/* Report data (expandable) */}
                 {isExpanded && (

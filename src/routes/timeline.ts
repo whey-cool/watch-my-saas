@@ -12,7 +12,8 @@ export const timelineRoute = new Hono();
 
 timelineRoute.get('/projects/:id/timeline', async (c) => {
   const projectId = c.req.param('id');
-  const limit = Math.min(parseInt(c.req.query('limit') ?? '50', 10), 200);
+  const limitParam = parseInt(c.req.query('limit') ?? '50', 10);
+  const limit = Math.min(isNaN(limitParam) ? 50 : limitParam, 200);
 
   const [recommendations, milestones, reports] = await Promise.all([
     prisma.recommendation.findMany({

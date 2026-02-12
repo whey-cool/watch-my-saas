@@ -106,10 +106,12 @@ export default function RecommendationsPage() {
 
       <h2 className="text-xl font-bold mb-4">Recommendations</h2>
 
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
+      <div className="flex gap-2 mb-6 border-b border-gray-200" role="tablist">
         {STATUS_TABS.map((status) => (
           <button
             key={status}
+            role="tab"
+            aria-selected={activeTab === status}
             onClick={() => setActiveTab(status)}
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
               activeTab === status

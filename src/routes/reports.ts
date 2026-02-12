@@ -8,15 +8,18 @@ import { prisma } from '../db/client.js';
 
 export const reportsRoute = new Hono();
 
+const VALID_REPORT_TYPES = ['weekly-digest', 'sprint-retro', 'alert'] as const;
+
 reportsRoute.get('/projects/:id/reports', async (c) => {
   const projectId = c.req.param('id');
-  const limit = Math.min(parseInt(c.req.query('limit') ?? '20', 10), 100);
+  const limitParam = parseInt(c.req.query('limit') ?? '20', 10);
+  const limit = Math.min(isNaN(limitParam) ? 20 : limitParam, 100);
   const cursor = c.req.query('cursor');
-  const typeFilter = c.req.query('type');
+  const typeParam = c.req.query('type');
 
   const where: Record<string, unknown> = { projectId };
-  if (typeFilter) {
-    where.type = typeFilter;
+  if (typeParam && VALID_REPORT_TYPES.includes(typeParam as typeof VALID_REPORT_TYPES[number])) {
+    where.type = typeParam;
   }
 
   const reports = await prisma.qualityReport.findMany({

@@ -57,7 +57,7 @@ export default function ProjectOverviewPage() {
       const res = await apiFetch<{ data: ProjectOverview }>(`/projects/${id}`);
       setProject(res.data);
     } catch (err) {
-      setError((err as Error).message);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setAnalyzing(false);
     }

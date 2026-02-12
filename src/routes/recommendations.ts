@@ -16,12 +16,16 @@ export const recommendationsRoute = new Hono();
 
 recommendationsRoute.get('/projects/:id/recommendations', async (c) => {
   const projectId = c.req.param('id');
-  const statusFilter = c.req.query('status') ?? 'active';
-  const severityFilter = c.req.query('severity');
+  const statusParam = c.req.query('status') ?? 'active';
+  const severityParam = c.req.query('severity');
+
+  const statusFilter = VALID_FILTER_STATUSES.includes(statusParam as RecommendationStatus)
+    ? statusParam
+    : 'active';
 
   const where: Record<string, unknown> = { projectId, status: statusFilter };
-  if (severityFilter && VALID_SEVERITIES.includes(severityFilter as typeof VALID_SEVERITIES[number])) {
-    where.severity = severityFilter;
+  if (severityParam && VALID_SEVERITIES.includes(severityParam as typeof VALID_SEVERITIES[number])) {
+    where.severity = severityParam;
   }
 
   const recommendations = await prisma.recommendation.findMany({
@@ -83,11 +87,24 @@ recommendationsRoute.patch('/projects/:id/recommendations/:rid', async (c) => {
 
 recommendationsRoute.post('/projects/:id/analyze', async (c) => {
   const projectId = c.req.param('id');
-  const result = await analyzeProject(projectId);
 
-  return c.json({
-    phase: result.phase,
-    recommendations: result.recommendations,
-    windowCount: result.windows.length,
-  });
+  try {
+    const result = await analyzeProject(projectId);
+
+    return c.json({
+      phase: result.phase,
+      recommendations: result.recommendations,
+      windowCount: result.windows.length,
+    });
+  } catch (error) {
+    return c.json(
+      {
+        type: 'about:blank',
+        status: 500,
+        title: 'Analysis Failed',
+        detail: error instanceof Error ? error.message : 'Internal server error',
+      },
+      500,
+    );
+  }
 });

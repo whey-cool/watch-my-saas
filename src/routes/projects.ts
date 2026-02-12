@@ -121,7 +121,8 @@ projectsRoute.get('/projects', async (c) => {
 
 projectsRoute.get('/projects/:id/commits', async (c) => {
   const projectId = c.req.param('id');
-  const limit = Math.min(parseInt(c.req.query('limit') ?? '50', 10), 100);
+  const limitParam = parseInt(c.req.query('limit') ?? '50', 10);
+  const limit = Math.min(isNaN(limitParam) ? 50 : limitParam, 100);
   const cursor = c.req.query('cursor');
 
   const commits = await prisma.commit.findMany({
