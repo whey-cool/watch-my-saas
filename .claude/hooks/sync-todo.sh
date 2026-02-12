@@ -14,8 +14,17 @@ touch "$TODO_FILE"
 
 node -e '
 const fs = require("fs");
-const input = JSON.parse(fs.readFileSync("/dev/stdin", "utf8"));
 const todoFile = process.argv[1];
+
+// Read stdin — exit gracefully if empty or malformed
+let input;
+try {
+  const raw = fs.readFileSync("/dev/stdin", "utf8").trim();
+  if (!raw) process.exit(0);
+  input = JSON.parse(raw);
+} catch {
+  process.exit(0);
+}
 
 const toolName = input.tool_name;
 const toolInput = input.tool_input || {};
@@ -26,7 +35,8 @@ function extractId(input) {
   if (!out) return null;
   if (typeof out === "object" && out.id) return String(out.id);
   if (typeof out === "string") {
-    const m = out.match(/(?:id|taskId)["\s:]+(\d+)/i);
+    // Match "Task #N" or "id:N" or "taskId:N"
+    const m = out.match(/(?:Task #|id|taskId)["\s:]*(\d+)/i);
     return m ? m[1] : null;
   }
   return null;

@@ -182,3 +182,4 @@ watch-my-saas/
 8. **Community signals are reviewed every session.** GitHub Discussions and issues, especially "Debugging My Workflow."
 9. **Dogfood loop is active.** Every recommendation about HerdMate/watch-my-saas evaluated for accuracy.
 10. **Competitive positioning is maintained.** GPS, not warning label. Constructive, never judgmental.
+11. **Hard enforcement via hooks.** File path whitelist, TDD gate, test-pass check, and coverage audit are hook-enforced, not just documented.
