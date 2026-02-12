@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { serveStatic } from '@hono/node-server/serve-static';
 import { errorHandler } from './middleware/error-handler.js';
 import { apiKeyAuth } from './middleware/auth.js';
 import { healthRoute } from './routes/health.js';
@@ -7,6 +8,7 @@ import { projectsRoute } from './routes/projects.js';
 
 export interface AppOptions {
   readonly apiKey: string;
+  readonly dashboardEnabled?: boolean;
 }
 
 export function createApp(options: AppOptions) {
@@ -24,6 +26,13 @@ export function createApp(options: AppOptions) {
 
   // Protected routes
   app.route('/api', projectsRoute);
+
+  // Dashboard SPA (feature-flagged)
+  if (options.dashboardEnabled) {
+    app.use('/*', serveStatic({ root: './dashboard/dist' }));
+    // SPA fallback — serve index.html for client-side routing
+    app.get('*', serveStatic({ root: './dashboard/dist', path: 'index.html' }));
+  }
 
   // 404 fallback
   app.notFound((c) => {

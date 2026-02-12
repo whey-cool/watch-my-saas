@@ -3,7 +3,10 @@ import { createApp } from './app.js';
 import { loadConfig } from './config.js';
 
 const config = loadConfig();
-const app = createApp({ apiKey: config.apiKey });
+const app = createApp({
+  apiKey: config.apiKey,
+  dashboardEnabled: config.features.dashboard,
+});
 
 serve(
   {
