@@ -39,9 +39,10 @@ Developed within the HerdMate ecosystem (`whey-cool/herdmate`). HerdMate provide
 - **Auth:** Simple API key (Bearer token). No OAuth, no Clerk.
 - **Tooling:** Claude Code as primary dev agent, Copilot Coding Agent for background tasks. `.claude/` config optimized in Session 2 for this stack (Hono/Prisma/vitest/RFC 7807).
 - **Recommendation Engine (OQ-1):** Heuristics-only v1. Optional BYOK LLM narration in v2.
-- **Deployment (OQ-2):** Docker Compose canonical, Railway one-click template for onboarding. Stateful server, no serverless.
+- **Deployment (OQ-2):** Docker Compose canonical, Render Blueprint for onboarding. Stateful server, no serverless.
 - **AI Tooling (OQ-3):** Claude Code for primary development. Copilot Coding Agent for background tasks via GitHub issues.
 - **Report Windowing (OQ-5):** Weekly digest (suppressed if <5 commits) + sprint retrospectives on velocity drop + event-driven public timeline + immediate alerts for revert spikes/coverage drops.
+- **Dashboard:** Incremental Vite + React SPA built alongside backend features each session. Feature-flagged (`WATCHMYSAAS_FEATURE_DASHBOARD`). Served from same container (Hono serves static files). Skeleton in Session 4, recommendation views in Session 5, history/timeline in Session 6, public polish in Session 7.
 
 ## What NOT to Build
 
@@ -65,10 +66,13 @@ Built the three-stage archaeology pipeline (fetch → analyze → wiki) that ext
 Audited and aligned all Claude Code configuration to the project stack. Fixed settings hook format. Deleted 18 irrelevant skills and 6 irrelevant commands. Fixed framework mismatches in 3 skills (jest→vitest, Next.js→Hono, Supabase→Prisma). Zero stale references remaining.
 
 ### Session 3: Archaeology Debrief & Decision Session
-Brainstorm session validating archaeology findings against developer memory. Confirmed sprint-drift cycle as the core pattern of AI-assisted development. Resolved OQ-1 (heuristics-only v1), OQ-2 (Docker Compose + Railway), OQ-3 (Claude Code primary + Copilot background), OQ-5 (hybrid weekly + event windowing). 4 brainstorm pages + 4 decision pages + Architecture.md updated.
+Brainstorm session validating archaeology findings against developer memory. Confirmed sprint-drift cycle as the core pattern of AI-assisted development. Resolved OQ-1 (heuristics-only v1), OQ-2 (Docker Compose + Render), OQ-3 (Claude Code primary + Copilot background), OQ-5 (hybrid weekly + event windowing). 4 brainstorm pages + 4 decision pages + Architecture.md updated.
 
 ### Session 3b: Competitive Analysis & PRD Revision
 Startup business analysis of Watch My SaaS. Deep competitive landscape with GitClear focus. OSS-as-product-discovery strategy (telemetry, community, feature flags, dogfood loop). Revised PRD session plan: HerdMate-first development, learning infrastructure from day one, adaptive sessions after first users.
+
+### Session 4a: Serena Onboarding & Session Workflow
+Onboarded Serena MCP server for semantic code intelligence. Created 6 memory files (project overview, tech stack, commands, structure, conventions, task checklist). Integrated Serena memory freshness checks into `/session-open` (section 1f) and `/session-close` (section 5b). Decided to commit `.serena/memories/` to the repo for cross-session persistence. Updated session commands to maintain both Claude Code auto memory and Serena memory at session boundaries.
 
 ## Next Session
 
@@ -76,7 +80,7 @@ Startup business analysis of Watch My SaaS. Deep competitive landscape with GitC
 
 Build the API scaffold, webhook pipeline, database schema, AND the learning infrastructure (telemetry, feature flags, community setup). Resolves OQ-4 (testing strategy). After this session, a GitHub webhook stores classified commits and the project is ready to learn from users.
 
-Key deliverables: Hono API + Prisma schema + webhook pipeline + Pulse telemetry (opt-in) + config-driven feature flags + GitHub Discussions + test suite foundation.
+Key deliverables: Hono API + Prisma schema + webhook pipeline + Pulse telemetry (opt-in) + config-driven feature flags + GitHub Discussions + test suite foundation + dashboard skeleton.
 
 Full spec: `wms-prd.md` → Session 4.
 
@@ -107,9 +111,11 @@ HerdMate-first: the tool must be useful on HerdMate before it ships to anyone el
 - `/wiki-changelog` — Append a changelog entry for recent work
 - `/wiki-brainstorm` — Capture a brainstorm session to the wiki
 
-### Project Standards
+### Session Management
 
-- `/standards` — Review project standards, competitive positioning, and cross-session invariants. Run at session start or when making architectural decisions.
+- `/session-open` — Documentation freshness audit + session setup. Run at session start.
+- `/session-close` — Documentation completeness verification + changelog. Run at session end.
+- `/standards` — Review project standards, competitive positioning, and cross-session invariants.
 
 ### Planned Commands (built in the session that needs them)
 
@@ -147,13 +153,16 @@ watch-my-saas/
 │       │   └── unified-timeline.ts    # Merges all signals chronologically
 │       ├── wiki-generators/           # One per wiki page
 │       └── __tests__/
-│           └── analyzers.test.ts      # 30 tests covering all analyzers
+│           └── analyzers.test.ts      # 35 tests covering all analyzers
 ├── docs/
 │   └── competitive-landscape-analysis.md  # Full competitive analysis
 ├── data/archaeology/                  # Gitignored — raw + analysis JSON
 ├── .claude/
-│   ├── commands/                      # Slash commands (wiki-*, standards)
+│   ├── commands/                      # Slash commands (wiki-*, session-*, standards)
 │   └── hooks/                         # PostToolUse hooks (task state sync)
+├── .serena/
+│   ├── project.yml                    # Serena MCP project config
+│   └── memories/                      # Semantic code intelligence memory (committed)
 ├── wms-prd.md                         # Product Requirements Document
 ├── CLAUDE.md                          # This file
 ├── tsconfig.json
