@@ -74,26 +74,25 @@ Startup business analysis of Watch My SaaS. Deep competitive landscape with GitC
 ### Session 4a: Serena Onboarding & Session Workflow
 Onboarded Serena MCP server for semantic code intelligence. Created 6 memory files (project overview, tech stack, commands, structure, conventions, task checklist). Integrated Serena memory freshness checks into `/session-open` (section 1f) and `/session-close` (section 5b). Decided to commit `.serena/memories/` to the repo for cross-session persistence. Updated session commands to maintain both Claude Code auto memory and Serena memory at session boundaries.
 
+### Session 4b: Foundation + Learning Infrastructure
+First code session. Built the full API scaffold, webhook pipeline, dashboard skeleton, and community infrastructure. Hono API with Zod validation, HMAC-verified webhook endpoint, commit classification service (AI tool detection ported from archaeology — validated on 1223 commits), Prisma schema (Project, Commit, Milestone, QualityReport), opt-in telemetry, feature-flagged dashboard (Vite + React + Tailwind), CI workflow, issue templates, CONTRIBUTING.md. 63 tests, TDD throughout. Resolved OQ-4 (testing strategy: unit + integration + fixtures from archaeology ground truth, 80% coverage threshold). Enforcement pyramid: workflow rules + hook infrastructure + invariant 11.
+
 ## Next Session
 
-### Session 4: Foundation + Learning Infrastructure
+### Session 5: Recommendations + HerdMate Goes Live
 
-Build the API scaffold, webhook pipeline, database schema, AND the learning infrastructure (telemetry, feature flags, community setup). Resolves OQ-4 (testing strategy). After this session, a GitHub webhook stores classified commits and the project is ready to learn from users.
+Build the recommendation engine (heuristics v1) and connect HerdMate as the first live project. The classification pipeline from Session 4 stores commits; Session 5 analyzes them for patterns (sprint-drift, ghost churn, test coverage drift, etc.) and surfaces actionable recommendations.
 
-Key deliverables: Hono API + Prisma schema + webhook pipeline + Pulse telemetry (opt-in) + config-driven feature flags + GitHub Discussions + test suite foundation + dashboard skeleton.
-
-Full spec: `wms-prd.md` → Session 4.
+Key deliverables: Recommendation engine + pattern detectors + HerdMate webhook setup + recommendation dashboard views + `/recommend-validate` command.
 
 ## Open Questions
 
-### OQ-4: Testing the thing that tests things [Session 4]
-
-Testing strategy for a code quality analysis tool. Archaeology findings from Sessions 1 and 3 provide ground truth — the recommendation engine should correctly detect patterns that were manually identified and validated.
+No open questions. OQ-1 through OQ-5 all resolved.
 
 ## Session Roadmap
 
 ```
-Session 4: Foundation + Learning Infrastructure
+Session 4: Foundation + Learning Infrastructure ← COMPLETE
 Session 5: Recommendations + HerdMate Goes Live
 Session 6: Backfill + Full HerdMate History
     [Personal use phase — weeks on HerdMate]
@@ -117,57 +116,71 @@ HerdMate-first: the tool must be useful on HerdMate before it ships to anyone el
 - `/session-close` — Documentation completeness verification + changelog. Run at session end.
 - `/standards` — Review project standards, competitive positioning, and cross-session invariants.
 
+### Verification Commands
+
+- `/webhook-test` — Send test GitHub webhook payloads to local API, verify classification output
+- `/telemetry-check` — Review Pulse telemetry state and validate heartbeat payload (invariant 7)
+
 ### Planned Commands (built in the session that needs them)
 
-- `/webhook-test` — _(Session 4)_ Send test GitHub webhook payloads to local API, verify classification output.
-- `/telemetry-check` — _(Session 4)_ Review Pulse telemetry data at session start (invariant 7).
 - `/recommend-validate` — _(Session 5)_ Run recommendation engine against archaeology fixtures, compare to ground truth, report detected/missed/false positive rate.
 - `/dogfood` — _(Session 6)_ Check recommendation accuracy log for HerdMate. Report true positive / false positive / useful / noisy breakdown (invariant 9).
 
-### Archaeology Commands
+### NPM Scripts
 
-- `npm run archaeology:fetch` — Fetch commit data from local repos + GitHub API
-- `npm run archaeology:analyze` — Run all analyzers on raw commit data
-- `npm run archaeology:wiki` — Generate wiki pages from analysis results
-- `npm run archaeology:all` — Run full pipeline (fetch → analyze → wiki)
-- `npm test` — Run analyzer tests (vitest)
+- `npm run dev` — Start API server in watch mode
+- `npm test` — Run all tests (vitest)
+- `npm run test:coverage` — Run tests with coverage report
+- `npm run db:migrate` — Run Prisma migrations
+- `npm run telemetry -- status|enable|disable` — Manage telemetry
+- `npm run archaeology:all` — Run full archaeology pipeline
 
 ## Project Structure
 
 ```
 watch-my-saas/
+├── src/
+│   ├── index.ts                       # @hono/node-server entry point
+│   ├── app.ts                         # Hono app factory (testable)
+│   ├── config.ts                      # Zod-validated env + feature flags
+│   ├── types.ts                       # ProblemDetails, ClassifiedCommit, Payload types
+│   ├── routes/
+│   │   ├── health.ts                  # GET /api/health
+│   │   ├── webhooks.ts                # POST /api/webhooks/github (HMAC)
+│   │   └── projects.ts               # GET /api/projects, commits
+│   ├── middleware/
+│   │   ├── auth.ts                    # Bearer token API key
+│   │   └── error-handler.ts           # RFC 9457 Problem Details
+│   ├── services/
+│   │   ├── classification.ts          # Author type + category + quality signals
+│   │   ├── webhook-processor.ts       # Extract → classify → store pipeline
+│   │   └── telemetry.ts              # Pulse heartbeat generation
+│   ├── db/
+│   │   └── client.ts                  # Prisma singleton
+│   └── __tests__/                     # 63 tests (vitest)
+├── dashboard/                         # Vite + React + Tailwind SPA
+│   └── src/
+│       ├── pages/                     # Health, Projects, Commits
+│       └── components/                # Layout, AuthorBadge
+├── prisma/
+│   └── schema.prisma                  # Project, Commit, Milestone, QualityReport
 ├── scripts/
+│   ├── telemetry.ts                   # CLI: status | enable | disable
 │   ├── wiki.sh                        # Wiki operations wrapper
-│   └── archaeology/
-│       ├── fetch-commits.sh           # Fetches from local git + GitHub API
-│       ├── parse-git-log.mjs          # Parses git log → JSON
-│       ├── transform-api-commits.mjs  # Normalizes GitHub API → JSON
-│       ├── analyze.ts                 # Orchestrator: runs all analyzers
-│       ├── generate-wiki-pages.ts     # Orchestrator: analysis → wiki markdown
-│       ├── types.ts                   # Shared TypeScript interfaces
-│       ├── analyzers/
-│       │   ├── tool-transitions.ts    # Co-Author signature timeline
-│       │   ├── velocity-phases.ts     # Weekly commit frequency + phases
-│       │   ├── quality-evolution.ts   # Test adoption, churn, reverts
-│       │   ├── structural-growth.ts   # Directory timeline, size trajectory
-│       │   └── unified-timeline.ts    # Merges all signals chronologically
-│       ├── wiki-generators/           # One per wiki page
-│       └── __tests__/
-│           └── analyzers.test.ts      # 35 tests covering all analyzers
-├── docs/
-│   └── competitive-landscape-analysis.md  # Full competitive analysis
-├── data/archaeology/                  # Gitignored — raw + analysis JSON
+│   └── archaeology/                   # Fetch + analyze + wiki pipeline
+├── .github/
+│   ├── workflows/ci.yml               # Test + type check on PR
+│   ├── ISSUE_TEMPLATE/                # bug, feature, copilot-task
+│   └── DISCUSSION_TEMPLATE/           # debugging-my-workflow
 ├── .claude/
-│   ├── commands/                      # Slash commands (wiki-*, session-*, standards)
-│   └── hooks/                         # PostToolUse hooks (task state sync)
-├── .serena/
-│   ├── project.yml                    # Serena MCP project config
-│   └── memories/                      # Semantic code intelligence memory (committed)
-├── wms-prd.md                         # Product Requirements Document
-├── CLAUDE.md                          # This file
-├── tsconfig.json
-├── package.json
-└── README.md
+│   ├── commands/                      # wiki-*, session-*, webhook-test, telemetry-check
+│   ├── hooks/                         # PostToolUse (task state sync)
+│   └── rules/workflow.md              # Phase gate protocol, swarm rules
+├── docker-compose.yml                 # Postgres + app
+├── Dockerfile                         # Multi-stage Node 20 build
+├── .env.example                       # All vars documented
+├── vitest.config.ts                   # 80% coverage thresholds
+└── CONTRIBUTING.md                    # Setup, TDD, PR guidelines
 ```
 
 ## Cross-Session Invariants

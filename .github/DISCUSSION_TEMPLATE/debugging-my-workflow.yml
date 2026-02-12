@@ -1,0 +1,33 @@
+title: "[Debug] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share what Watch My SaaS surfaced about your development workflow.
+        This is the highest-signal category — your debugging stories help us build better recommendations.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What happened?
+      description: What pattern or insight did Watch My SaaS show you?
+    validations:
+      required: true
+
+  - type: textarea
+    id: action
+    attributes:
+      label: What did you do about it?
+      description: Did the insight change how you work? Was the recommendation helpful?
+
+  - type: dropdown
+    id: accuracy
+    attributes:
+      label: Was the insight accurate?
+      options:
+        - Spot on
+        - Mostly right
+        - Partially useful
+        - Not helpful
+        - Misleading
