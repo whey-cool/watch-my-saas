@@ -75,7 +75,7 @@ Startup business analysis of Watch My SaaS. Deep competitive landscape with GitC
 Onboarded Serena MCP server for semantic code intelligence. Created 6 memory files (project overview, tech stack, commands, structure, conventions, task checklist). Integrated Serena memory freshness checks into `/session-open` (section 1f) and `/session-close` (section 5b). Decided to commit `.serena/memories/` to the repo for cross-session persistence. Updated session commands to maintain both Claude Code auto memory and Serena memory at session boundaries.
 
 ### Session 4b: Foundation + Learning Infrastructure
-First code session. Built the full API scaffold, webhook pipeline, dashboard skeleton, and community infrastructure. Hono API with Zod validation, HMAC-verified webhook endpoint, commit classification service (AI tool detection ported from archaeology — validated on 1223 commits), Prisma schema (Project, Commit, Milestone, QualityReport), opt-in telemetry, feature-flagged dashboard (Vite + React + Tailwind), CI workflow, issue templates, CONTRIBUTING.md. 63 tests, TDD throughout. Resolved OQ-4 (testing strategy: unit + integration + fixtures from archaeology ground truth, 80% coverage threshold). Enforcement pyramid: workflow rules + hook infrastructure + invariant 11.
+First code session. Built the full API scaffold, webhook pipeline, dashboard skeleton, and community infrastructure. Hono API with Zod validation, HMAC-verified webhook endpoint, commit classification service (AI tool detection ported from archaeology — validated on 1223 commits), Prisma schema (Project, Commit, Milestone, QualityReport), opt-in telemetry, feature-flagged dashboard (Vite + React + Tailwind), CI workflow, issue templates, CONTRIBUTING.md. 66 tests, TDD throughout. Resolved OQ-4 (testing strategy: unit + integration + fixtures from archaeology ground truth, 80% coverage threshold). Enforcement pyramid: workflow rules + hook infrastructure + invariant 11.
 
 ## Next Session
 
@@ -157,7 +157,7 @@ watch-my-saas/
 │   │   └── telemetry.ts              # Pulse heartbeat generation
 │   ├── db/
 │   │   └── client.ts                  # Prisma singleton
-│   └── __tests__/                     # 63 tests (vitest)
+│   └── __tests__/                     # 66 tests (vitest)
 ├── dashboard/                         # Vite + React + Tailwind SPA
 │   └── src/
 │       ├── pages/                     # Health, Projects, Commits
