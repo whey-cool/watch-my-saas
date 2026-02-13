@@ -19,18 +19,20 @@
 - User-friendly messages in UI-facing code
 - Detailed context in server-side logs
 - Never silently swallow errors
-- RFC 9457 Problem Details error responses for the API (evolved from HerdMate's RFC 7807)
+- RFC 9457 Problem Details error responses for the API (`application/problem+json`)
 
-## API Conventions (planned)
-- Consistent envelope: `{ success, data?, error?, meta? }`
-- Cursor pagination (from HerdMate patterns)
-- Bearer token auth
+## API Conventions
+- RFC 9457 Problem Details for errors
+- Direct data responses (not wrapped in envelope) for success
+- Cursor pagination for list endpoints
+- Bearer token auth (skipped for health + webhooks)
+- HMAC-SHA256 for webhook verification
 
 ## Testing
 - **TDD mandatory**: Write test → fail → implement → pass → refactor
 - **vitest** as test runner
-- **80%+ coverage** minimum
-- Unit + integration + E2E (Playwright for E2E)
+- **80%+ coverage** minimum (current: 97.54%)
+- Unit + integration tests (Playwright planned for E2E)
 
 ## Git
 - Conventional commits: `<type>: <description>` (feat, fix, refactor, docs, test, chore, perf, ci)
@@ -40,3 +42,7 @@
 - Files: kebab-case (`tool-transitions.ts`)
 - TypeScript: camelCase for variables/functions, PascalCase for types/interfaces/classes
 - Test files: `__tests__/` directories with `.test.ts` suffix
+
+## Detector Pattern
+- Pure functions: `(current: MetricWindow, history: readonly MetricWindow[], commits: readonly CommitRecord[]) => RecommendationInput | null`
+- EvidenceItem shape: `{ commits: string[], files: string[], metrics: Record<string, number> }`

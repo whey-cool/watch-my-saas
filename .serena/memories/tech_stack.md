@@ -26,7 +26,7 @@
 
 ## Database
 - **PostgreSQL 16** (via Docker Compose, port 5433 to avoid HerdMate conflict)
-- 4 models: Project, Commit, Milestone, QualityReport
+- 5 models: Project, Commit, Milestone, QualityReport, Recommendation
 - Compound unique: [projectId, sha] on Commit
 
 ## Deployment
