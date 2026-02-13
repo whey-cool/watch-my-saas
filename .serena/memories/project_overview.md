@@ -19,16 +19,17 @@ Heuristic-based pattern detection from development logs. Not a metrics dashboard
 Built within the HerdMate ecosystem (whey-cool/herdmate). HerdMate is the first and most important user. The founder uses Watch My SaaS to guide her own HerdMate development.
 
 ## Current State
-- **Session 5 complete** — Recommendation engine (heuristics v1)
-- 7 pattern detectors: Sprint-Drift, Ghost Churn, AI Handoff Cliff, Tool Transition, Test Drift, Changelog Silence, Workflow Breakthrough
-- Metric aggregation: 7-day windows from commit streams
-- Phase detector: Building / Drifting / Stabilizing / Ship-Ready
-- Engine orchestrator: fetch → aggregate → detect → deduplicate → store
-- 10 API routes (health, webhooks, projects, overview, recommendations, reports, timeline)
-- Dashboard GPS views: ProjectOverview (L1), RecommendationsPage (L2), QualityReportsPage (L3)
+- **Session 6 complete** — Backfill pipeline + milestone detection + dogfood tracking
+- GitHub API client with pagination, rate limits, auth
+- Two-pass backfill: fast list pass (100/page) + optional enrichment for file data
+- Milestone detector: 5 patterns (tool transition, velocity shift, gap recovery, quality signal, structural change)
+- Accuracy tracking for dogfood loop (true-positive/false-positive/useful/noisy)
+- 14 API routes (health, webhooks, projects, overview, recommendations, reports, timeline, backfill, milestones, metrics)
+- Dashboard GPS views: ProjectOverview (L1), Recommendations (L2), QualityReports (L3), Timeline, History, Backfill
 - `/recommend-validate` passes 100% (7/7 patterns, 0 false positives)
-- 161 tests, 97.54% coverage, zero type errors
+- `/dogfood` command for accuracy tracking
+- 212 tests, 95.54% coverage, zero type errors
 - CI: GitHub Actions (test + type check on PR/push)
 - Community: GitHub Discussions enabled, issue templates, CONTRIBUTING.md
-- **Next: Session 6** — Backfill + Full HerdMate History + HerdMate Goes Live
+- **Next: Session 7** — Public Surface + Ship to Others (after personal use phase on HerdMate)
 - All open questions resolved (OQ-1 through OQ-5)

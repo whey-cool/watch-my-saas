@@ -49,3 +49,8 @@
 - `gh pr create` — Create pull request
 - `gh label list` — List repo labels
 - `gh api repos/whey-cool/watch-my-saas/milestones` — List milestones
+
+## Backfill
+- `GITHUB_TOKEN` env var — Required for private repos, recommended for rate limits (60 req/hr → 5000 req/hr)
+- Trigger via API: `POST /api/projects/:id/backfill` with `{ token: "ghp_...", enrich: true }`
+- Poll status: `GET /api/projects/:id/backfill/status`
