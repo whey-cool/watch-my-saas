@@ -1,0 +1,35 @@
+databases:
+  - name: watchmysaas-db
+    plan: free
+    databaseName: watchmysaas
+    user: watchmysaas
+    postgresMajorVersion: 16
+
+services:
+  - type: web
+    name: watchmysaas
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: watchmysaas-db
+          property: connectionString
+      - key: API_KEY
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: WATCHMYSAAS_FEATURE_DASHBOARD
+        value: "true"
+      - key: WATCHMYSAAS_FEATURE_PUBLIC_TIMELINE
+        value: "false"
+      - key: WATCHMYSAAS_TELEMETRY
+        value: "false"
+      - key: WATCHMYSAAS_INSTANCE_ID
+        value: ""
+      - key: GITHUB_TOKEN
+        sync: false

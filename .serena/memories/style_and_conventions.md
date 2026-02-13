@@ -31,7 +31,7 @@
 ## Testing
 - **TDD mandatory**: Write test → fail → implement → pass → refactor
 - **vitest** as test runner
-- **80%+ coverage** minimum (current: 97.54%)
+- **80%+ coverage** minimum (current: 95.54%)
 - Unit + integration tests (Playwright planned for E2E)
 
 ## Git

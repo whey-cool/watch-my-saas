@@ -1,10 +1,66 @@
+import { randomBytes, randomUUID } from 'node:crypto';
 import { Hono } from 'hono';
+import { z } from 'zod';
 import { prisma } from '../db/client.js';
 import { buildMetricWindows, calculateTrend } from '../services/recommendations/metrics.js';
 import { detectPhase } from '../services/recommendations/phase-detector.js';
 import type { CommitRecord } from '../types.js';
 
+const createProjectSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  repoFullName: z.string().min(1).regex(
+    /^[^/]+\/[^/]+$/,
+    'Must be in owner/repo format',
+  ),
+});
+
 export const projectsRoute = new Hono();
+
+projectsRoute.post('/projects', async (c) => {
+  const raw = await c.req.json();
+  const body = createProjectSchema.parse(raw);
+
+  const webhookSecret = randomBytes(32).toString('hex');
+  const apiKey = randomUUID();
+
+  try {
+    const project = await prisma.project.create({
+      data: {
+        name: body.name,
+        repoFullName: body.repoFullName,
+        webhookSecret,
+        apiKey,
+      },
+    });
+
+    return c.json(
+      {
+        data: {
+          id: project.id,
+          name: project.name,
+          repoFullName: project.repoFullName,
+          webhookSecret: project.webhookSecret,
+          apiKey: project.apiKey,
+          createdAt: project.createdAt.toISOString(),
+        },
+      },
+      201,
+    );
+  } catch (error: unknown) {
+    if (error !== null && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+      return c.json(
+        {
+          type: 'about:blank',
+          status: 409,
+          title: 'Conflict',
+          detail: 'A project with this repository already exists',
+        },
+        409,
+      );
+    }
+    throw error;
+  }
+});
 
 projectsRoute.get('/projects/:id', async (c) => {
   const projectId = c.req.param('id');
