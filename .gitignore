@@ -42,3 +42,7 @@ wms-prd.md
 
 # Claude Code session todo (managed by hooks)
 .claude-todo.txt
+
+# Playwright
+dashboard/playwright-report/
+dashboard/test-results/

@@ -27,6 +27,7 @@
     "db:push": "prisma db push",
     "telemetry": "tsx scripts/telemetry.ts",
     "recommend:validate": "tsx scripts/recommend-validate.ts",
+    "test:e2e": "npm run test:e2e --prefix dashboard",
     "archaeology:fetch": "bash scripts/archaeology/fetch-commits.sh --org whey-cool --local-repos /home/megan/Workspace/herdmate --skip herdmate-freemium --output-dir data/archaeology/raw",
     "archaeology:analyze": "tsx scripts/archaeology/analyze.ts --input-dir data/archaeology/raw --output-dir data/archaeology/analysis",
     "archaeology:wiki": "tsx scripts/archaeology/generate-wiki-pages.ts --input-dir data/archaeology/analysis --output-dir .wiki",
