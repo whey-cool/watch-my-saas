@@ -16,6 +16,8 @@ type RecommendationStatus = 'active' | 'acknowledged' | 'dismissed' | 'resolved'
 
 type RecommendationSeverity = 'critical' | 'high' | 'medium' | 'low';
 
+type AccuracyLabel = 'true-positive' | 'false-positive' | 'useful' | 'noisy';
+
 interface Recommendation {
   id: string;
   pattern: RecommendationPattern;
@@ -29,6 +31,7 @@ interface Recommendation {
   };
   nextSteps: string[];
   status: RecommendationStatus;
+  accuracy: AccuracyLabel | null;
   detectedAt: string;
   acknowledgedAt: string | null;
   dismissedAt: string | null;
@@ -87,6 +90,25 @@ export default function RecommendationsPage() {
       setRecommendations((prev) => prev.filter((r) => r.id !== recId));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update recommendation');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const updateAccuracy = async (recId: string, accuracy: AccuracyLabel) => {
+    if (!id) return;
+
+    setUpdatingId(recId);
+    try {
+      await apiFetch(`/projects/${id}/recommendations/${recId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ accuracy }),
+      });
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === recId ? { ...r, accuracy } : r)),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update accuracy');
     } finally {
       setUpdatingId(null);
     }
@@ -207,6 +229,24 @@ export default function RecommendationsPage() {
                     <li key={idx}>{step}</li>
                   ))}
                 </ul>
+              </div>
+
+              <div className="flex items-center gap-2 mb-4 pt-3 border-t border-gray-200">
+                <span className="text-sm text-gray-500 mr-1">Rate:</span>
+                {(['true-positive', 'false-positive', 'useful', 'noisy'] as AccuracyLabel[]).map((label) => (
+                  <button
+                    key={label}
+                    onClick={() => updateAccuracy(rec.id, label)}
+                    disabled={updatingId === rec.id}
+                    className={`px-2 py-1 text-xs rounded border transition-colors ${
+                      rec.accuracy === label
+                        ? 'bg-blue-100 border-blue-400 text-blue-800 font-medium'
+                        : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
 
               {rec.status === 'active' && (

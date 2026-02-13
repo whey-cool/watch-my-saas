@@ -16,6 +16,7 @@ const configSchema = z.object({
     .enum(['development', 'production', 'test'])
     .optional()
     .default('development'),
+  GITHUB_TOKEN: z.string().optional(),
   WATCHMYSAAS_FEATURE_DASHBOARD: booleanString,
   WATCHMYSAAS_FEATURE_PUBLIC_TIMELINE: booleanString,
   WATCHMYSAAS_TELEMETRY: booleanString,
@@ -27,6 +28,7 @@ export interface AppConfig {
   readonly apiKey: string;
   readonly port: number;
   readonly nodeEnv: 'development' | 'production' | 'test';
+  readonly githubToken: string | undefined;
   readonly instanceId: string;
   readonly features: {
     readonly dashboard: boolean;
@@ -43,6 +45,7 @@ export function loadConfig(): AppConfig {
     apiKey: parsed.API_KEY,
     port: parsed.PORT,
     nodeEnv: parsed.NODE_ENV,
+    githubToken: parsed.GITHUB_TOKEN,
     instanceId: parsed.WATCHMYSAAS_INSTANCE_ID,
     features: {
       dashboard: parsed.WATCHMYSAAS_FEATURE_DASHBOARD,

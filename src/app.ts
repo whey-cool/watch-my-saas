@@ -8,6 +8,9 @@ import { projectsRoute } from './routes/projects.js';
 import { recommendationsRoute } from './routes/recommendations.js';
 import { reportsRoute } from './routes/reports.js';
 import { timelineRoute } from './routes/timeline.js';
+import { backfillRoute } from './routes/backfill.js';
+import { milestonesRoute } from './routes/milestones.js';
+import { metricsRoute } from './routes/metrics.js';
 
 export interface AppOptions {
   readonly apiKey: string;
@@ -32,6 +35,9 @@ export function createApp(options: AppOptions) {
   app.route('/api', recommendationsRoute);
   app.route('/api', reportsRoute);
   app.route('/api', timelineRoute);
+  app.route('/api', backfillRoute);
+  app.route('/api', milestonesRoute);
+  app.route('/api', metricsRoute);
 
   // Dashboard SPA (feature-flagged)
   if (options.dashboardEnabled) {

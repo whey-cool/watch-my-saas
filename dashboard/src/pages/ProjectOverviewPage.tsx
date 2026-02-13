@@ -115,7 +115,7 @@ export default function ProjectOverviewPage() {
       </div>
 
       {/* Quick links */}
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Link
           to={`/projects/${project.id}/recommendations`}
           className="text-blue-600 hover:underline font-medium"
@@ -128,6 +128,24 @@ export default function ProjectOverviewPage() {
           className="text-blue-600 hover:underline font-medium"
         >
           View commits ({project.commitCount})
+        </Link>
+        <Link
+          to={`/projects/${project.id}/timeline`}
+          className="text-blue-600 hover:underline font-medium"
+        >
+          Timeline
+        </Link>
+        <Link
+          to={`/projects/${project.id}/history`}
+          className="text-blue-600 hover:underline font-medium"
+        >
+          History
+        </Link>
+        <Link
+          to={`/projects/${project.id}/backfill`}
+          className="text-blue-600 hover:underline font-medium"
+        >
+          Backfill
         </Link>
       </div>
 

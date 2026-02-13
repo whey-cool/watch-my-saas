@@ -80,13 +80,16 @@ First code session. Built the full API scaffold, webhook pipeline, dashboard ske
 ### Session 5: Recommendations Engine
 Built the full recommendation engine (heuristics v1) transforming Watch My SaaS from a data collector into a development GPS. 7 pattern detectors (Sprint-Drift, Ghost Churn, AI Handoff Cliff, Tool Transition, Test Coverage Drift, Changelog Silence, Workflow Breakthrough) with pure-function architecture. Metric aggregation pipeline builds 7-day windows from commit streams. Phase detector synthesizes metrics into project phase (Building/Drifting/Stabilizing/Ship-Ready). Engine orchestrator handles staleness, deduplication, and recommendation lifecycle. 6 new API endpoints (project overview, recommendations CRUD, analyze trigger, reports, timeline). Dashboard upgraded with GPS-style progressive disclosure: project overview (L1), recommendations feed (L2), quality reports (L3). `/recommend-validate` command validates all 7 detectors against synthetic ground truth at 100% accuracy. 161 tests, 97.5% statement coverage, TDD throughout. HerdMate webhook setup deferred to session start of Session 6 (requires live GitHub configuration).
 
+### Session 6: Backfill + Full HerdMate History
+Built the complete backfill pipeline for importing historical commit data from GitHub API. GitHub client with pagination, rate limit tracking, and auth (native fetch). Two-pass backfill service: fast list pass (100/page) + optional enrichment pass for file data. In-memory job tracking with progress polling. Milestone detector identifies 5 patterns from commit history: tool transitions, velocity shifts (>2x or <0.5x w/w), gap recoveries (7+ day), quality signals (test ratio jumps), structural changes. Accuracy tracking for dogfood loop (true-positive/false-positive/useful/noisy). 4 new API endpoints (backfill trigger/status, milestones CRUD, metrics history). Dashboard: TimelinePage (chronological events), HistoryPage (weekly metrics table), BackfillPage (trigger + progress polling), accuracy rating buttons on recommendations. `/dogfood` command queries accuracy breakdown. 211 tests, 96.5% statement coverage, 7/7 pattern detection (no regression), zero type errors. TDD throughout.
+
 ## Next Session
 
-### Session 6: Backfill + Full HerdMate History
+### Session 7: Public Surface + Ship to Others
 
-Connect HerdMate as the first live project. Set up GitHub webhook on `whey-cool/herdmate`, backfill existing commit history, run the recommendation engine against real data, and begin the dogfood loop. Visual timeline view for the dashboard.
+Polish the public-facing experience. Public timeline embed widget (vanilla TS). Landing page / README for OSS discovery. Docker Compose deployment validation. First external user onboarding flow.
 
-Key deliverables: HerdMate webhook live + commit backfill + dogfood loop active + timeline visualization + `/dogfood` command.
+Key deliverables: Public timeline embed + polished docs + Docker deployment tested + first external user path.
 
 ## Open Questions
 
@@ -97,7 +100,7 @@ No open questions. OQ-1 through OQ-5 all resolved.
 ```
 Session 4: Foundation + Learning Infrastructure ← COMPLETE
 Session 5: Recommendations Engine ← COMPLETE
-Session 6: Backfill + Full HerdMate History + HerdMate Goes Live
+Session 6: Backfill + Full HerdMate History ← COMPLETE
     [Personal use phase — weeks on HerdMate]
 Session 7: Public Surface + Ship to Others
 Session 8+: Adaptive (data-driven)
@@ -124,10 +127,7 @@ HerdMate-first: the tool must be useful on HerdMate before it ships to anyone el
 - `/webhook-test` — Send test GitHub webhook payloads to local API, verify classification output
 - `/telemetry-check` — Review Pulse telemetry state and validate heartbeat payload (invariant 7)
 - `/recommend-validate` — Run recommendation engine against synthetic ground truth, report detected/missed/false positive rate per pattern.
-
-### Planned Commands (built in the session that needs them)
-
-- `/dogfood` — _(Session 6)_ Check recommendation accuracy log for HerdMate. Report true positive / false positive / useful / noisy breakdown (invariant 9).
+- `/dogfood` — Check recommendation accuracy log. Report true positive / false positive / useful / noisy breakdown (invariant 9).
 
 ### NPM Scripts
 
@@ -152,9 +152,12 @@ watch-my-saas/
 │   │   ├── health.ts                  # GET /api/health
 │   │   ├── webhooks.ts                # POST /api/webhooks/github (HMAC)
 │   │   ├── projects.ts               # GET /api/projects, GET /api/projects/:id overview
-│   │   ├── recommendations.ts         # GET/PATCH recommendations, POST analyze
+│   │   ├── recommendations.ts         # GET/PATCH recommendations + accuracy, POST analyze
 │   │   ├── reports.ts                 # GET /api/projects/:id/reports (paginated)
-│   │   └── timeline.ts               # GET /api/projects/:id/timeline
+│   │   ├── timeline.ts               # GET /api/projects/:id/timeline
+│   │   ├── backfill.ts               # POST trigger, GET status
+│   │   ├── milestones.ts             # GET list, POST create
+│   │   └── metrics.ts                # GET /api/projects/:id/metrics/history
 │   ├── middleware/
 │   │   ├── auth.ts                    # Bearer token API key
 │   │   └── error-handler.ts           # RFC 9457 Problem Details
@@ -162,6 +165,9 @@ watch-my-saas/
 │   │   ├── classification.ts          # Author type + category + quality signals
 │   │   ├── webhook-processor.ts       # Extract → classify → store pipeline
 │   │   ├── telemetry.ts              # Pulse heartbeat generation
+│   │   ├── github-client.ts          # GitHub API: listCommits, getCommitDetail, pagination, rate limits
+│   │   ├── backfill.ts               # Historical commit backfill orchestrator (two-pass)
+│   │   ├── milestone-detector.ts     # 5-pattern milestone detection from commit history
 │   │   └── recommendations/           # Pattern detection engine
 │   │       ├── engine.ts              # Orchestrator: fetch → aggregate → detect → store
 │   │       ├── metrics.ts             # MetricWindow aggregation + trend calculation
@@ -177,13 +183,13 @@ watch-my-saas/
 │   │           └── workflow-breakthrough.ts
 │   ├── db/
 │   │   └── client.ts                  # Prisma singleton
-│   └── __tests__/                     # 161 tests (vitest)
+│   └── __tests__/                     # 211 tests (vitest)
 ├── dashboard/                         # Vite + React + Tailwind SPA
 │   └── src/
-│       ├── pages/                     # Health, Projects, Commits, Overview, Recommendations, Reports
-│       └── components/                # Layout, AuthorBadge, PhaseBadge, SeverityBadge, MetricCard
+│       ├── pages/                     # Health, Projects, Commits, Overview, Recommendations, Reports, Timeline, History, Backfill
+│       └── components/                # Layout, AuthorBadge, PhaseBadge, SeverityBadge, MetricCard, TimelineEvent
 ├── prisma/
-│   └── schema.prisma                  # Project, Commit, Milestone, QualityReport, Recommendation
+│   └── schema.prisma                  # Project, Commit, Milestone, QualityReport, Recommendation (+ accuracy)
 ├── scripts/
 │   ├── telemetry.ts                   # CLI: status | enable | disable
 │   ├── recommend-validate.ts          # Recommendation engine ground truth validation

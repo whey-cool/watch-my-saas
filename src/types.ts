@@ -219,3 +219,28 @@ export interface TimelineEvent {
   readonly timestamp: string;
   readonly metadata?: Readonly<Record<string, unknown>>;
 }
+
+// --- Backfill Types ---
+
+export type BackfillPhase = 'listing' | 'enriching' | 'analyzing' | 'completed' | 'error';
+
+export type MilestoneType = 'tool-transition' | 'velocity-shift' | 'quality-signal'
+  | 'structural-change' | 'gap-recovery';
+
+export type AccuracyLabel = 'true-positive' | 'false-positive' | 'useful' | 'noisy';
+
+export interface BackfillProgress {
+  readonly phase: BackfillPhase;
+  readonly processed: number;
+  readonly total: number;
+  readonly message: string;
+}
+
+export interface BackfillStatus {
+  readonly projectId: string;
+  readonly status: BackfillPhase;
+  readonly progress: BackfillProgress | null;
+  readonly startedAt: string | null;
+  readonly completedAt: string | null;
+  readonly error: string | null;
+}

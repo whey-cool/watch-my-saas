@@ -6,6 +6,9 @@ import CommitsPage from './pages/CommitsPage';
 import ProjectOverviewPage from './pages/ProjectOverviewPage';
 import RecommendationsPage from './pages/RecommendationsPage';
 import QualityReportsPage from './pages/QualityReportsPage';
+import TimelinePage from './pages/TimelinePage';
+import HistoryPage from './pages/HistoryPage';
+import BackfillPage from './pages/BackfillPage';
 
 export default function App() {
   return (
@@ -18,6 +21,9 @@ export default function App() {
         <Route path="/projects/:id/commits" element={<CommitsPage />} />
         <Route path="/projects/:id/recommendations" element={<RecommendationsPage />} />
         <Route path="/projects/:id/reports" element={<QualityReportsPage />} />
+        <Route path="/projects/:id/timeline" element={<TimelinePage />} />
+        <Route path="/projects/:id/history" element={<HistoryPage />} />
+        <Route path="/projects/:id/backfill" element={<BackfillPage />} />
       </Route>
     </Routes>
   );
